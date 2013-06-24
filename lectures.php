@@ -129,11 +129,11 @@ else {
                                             <input type="hidden" name="status" value="<?=$lectures_row['status']?>" />
                                             <td><?=$num?></td>
                                             <td><a href="<?=APPLY_URL."?view=".$lectures_row['id']?>"><?=$lectures_row['title']?></a></td>
-                                            <td><a href="<?=PROFILE_URL."?id=".$lectures_row['speaker_ID']?>"><?=$lectures_row['speaker']?></a></td>
+                                            <td><a href="<?=PROFILE_URL."?view=".$lectures_row['speaker_ID']?>"><?=$lectures_row['speaker']?></a></td>
                                             <td><?=$lectures_row['duration']?> хвилин</td>
                                             <td><?=print_status($lectures_row['status'])?></td>
                                             <td class="datetime"><span><?=$lectures_row['date']?></span> <span><?=$lectures_row['time']?></span></td>
-                                            <td data-toggle="tooltip" title="<?=$lectures_row['flow']?>"><a href="<?=FLOW_URL."?id=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow_ID']?></td>
+                                            <td data-toggle="tooltip" title="<?=$lectures_row['flow']?>"><a href="<?=FLOW_URL."?view=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow_ID']?></td>
                                         </tr>
                                             <?php
                                             $num++;
@@ -214,7 +214,7 @@ else {
                                     <td><?=$lectures_row['duration']?> хвилин</td>
                                     <td><?=print_status($lectures_row['status'])?></td>
                                     <td class="datetime"><span><?=$lectures_row['date']?></span> <span><?=$lectures_row['time']?></span></td>
-                                    <td data-toggle="tooltip" title="<?=$lectures_row['place']?>"><a href="<?=FLOW_URL."?id=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow']?></td>
+                                    <td data-toggle="tooltip" title="<?=$lectures_row['place']?>"><a href="<?=FLOW_URL."?view=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow']?></td>
                                 </tr>
                                     <?php
                                     $num++;
@@ -338,13 +338,13 @@ else {
                                                 <input type="hidden" name="status" value="<?=$tabs[$i]['name'] == 'ready' ? $reg_status : 'registered'?>" />
                                                 <td><?=$num?></td>
                                                 <td><a href="<?=APPLY_URL."?view=".$lectures_row['id']?>"><?=$lectures_row['title']?></a></td>
-                                                <td><a href="<?=PROFILE_URL."?id=".$lectures_row['speaker_ID']?>"><?=$lectures_row['speaker']?></a></td>
+                                                <td><a href="<?=PROFILE_URL."?view=".$lectures_row['speaker_ID']?>"><?=$lectures_row['speaker']?></a></td>
                                                 <td><?=$lectures_row['duration']?> хвилин</td>
                                                 <? if ($tabs[$i]['name'] == 'ready'): ?>
                                                 <td><?=print_status($reg_status)?></td>
                                                 <? endif; ?>
                                                 <td class="datetime"><span><?=$lectures_row['date']?></span> <span><?=$lectures_row['time']?></span></td>
-                                                <td data-toggle="tooltip" title="<?=$lectures_row['place']?>"><a href="<?=FLOW_URL."?id=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow']?></td>
+                                                <td data-toggle="tooltip" title="<?=$lectures_row['place']?>"><a href="<?=FLOW_URL."?view=".$lectures_row['flow_ID']?>"><?=$lectures_row['flow']?></td>
                                             </tr>
                                                 <?php
                                                 $num++;

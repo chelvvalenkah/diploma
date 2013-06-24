@@ -46,10 +46,13 @@ else {
         }
         else {
             $author = $mysqli->real_escape_string($_POST['author']);
-            $author_result = $mysqli->query("SELECT CONCAT_WS(' ', surname, name) AS userName FROM participants WHERE ID = $_SESSION[userID]");
-            $author_row = $author_result->fetch_assoc();
-            if ($author_row['userName'] == $_SESSION['userName']) {
-                $report_data['speaker_ID'] = $_SESSION['userID'];
+            $author_result = $mysqli->query("SELECT id, CONCAT_WS(' ', surname, name) AS userName FROM participants WHERE ID = '$author'");
+            if ($author_result->num_rows > 0) {
+                $author_row = $author_result->fetch_assoc();
+                if ($author_row['id'] == $_SESSION['userID']) {
+                    $report_data['speaker_ID'] = $author;
+                }
+                else $errorMsg[] = "Ви можете подавати доповіді лише від свого імені!";
             }
             else $errorMsg[] = "Такий доповідач не зареєстрований!";
         }
@@ -67,7 +70,6 @@ else {
 
         if ($_SESSION['role'] == 'admin') {
             $errorMsg[] = "Організатори не можуть подавати чи редагувати доповіді!";
-            if (arg_exists_not_null($_POST['date']))
         }
 
         # Generating MySQL request
@@ -76,7 +78,8 @@ else {
             $fields = "(";
             $values = "(";
             if ($_POST['mode'] == 'edit') {
-                if ($mysqli->query("SELECT * FROM lectures WHERE ID = '".$mysqli->real_escape_string($_POST['lectureID'])."' AND speaker_ID = '".$mysqli->real_escape_string($_SESSION['userID'])."'")) {
+                if ($mysqli->query("SELECT * FROM lectures WHERE ID = '".$mysqli->real_escape_string($_POST['lectureID'])."' AND speaker_ID = '"
+                    .$mysqli->real_escape_string($_SESSION['userID'])."'")->num_rows > 0) {
                     if (!$mysqli->query("DELETE FROM lectures WHERE ID = {$_POST['lectureID']}")) {
                         header("HTTP/1.1 500 Internal Server Error");
                         $errors['errorMsg'] = "Помилка при роботі з базою даних. Спробуйте пізніше.";
