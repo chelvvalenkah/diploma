@@ -188,6 +188,10 @@ header {
     border-top: 1px dotted #CCC;
 }
 
+.after30mins {
+    background: #e3e3e3;
+}
+
 .hourSelected {
     position: absolute;
     background: #327CCB;

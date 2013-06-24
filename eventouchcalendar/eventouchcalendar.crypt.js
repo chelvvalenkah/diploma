@@ -56,10 +56,18 @@
 		function createEvents() {
 			conf_events.forEach(function(conf_event) {
 			/*for (var conf_event in conf_events) {*/
+                var time = conf_event.start.split(':');
+                var height_5mins = params.cell_height/3;
+                var timeCorrection = ((time[1] - (time[1]/15|0)*15)/5|0)*height_5mins;
+                if (time[1] - (((time[1]/15|0)*15)+timeCorrection/3*5) >= 3) timeCorrection += height_5mins;
+                if (timeCorrection == 9) timeCorrection += BORDER_CELL_LENGTH;
+                time[1] = (time[1]/15|0)*15;
+                if (time[1] < 10) time[1] = '0'+time[1];
+                conf_event.start = time.join(':');
 				var groupLength = conf_event.length;
 				var $columnId = $("#agenda tbody tr td").index($('td[data-date="'+conf_event.date+'"]'));
 				var evtHeight = groupLength * (params.cell_height + BORDER_CELL_LENGTH) - 2 * BORDER_CELL_LENGTH;
-				var evtTop = $('#agenda tbody tr td').eq($columnId).find('span[data-time="'+conf_event.start+'"]').offset().top;
+				var evtTop = $('#agenda tbody tr td').eq($columnId).find('span[data-time="'+conf_event.start+'"]').offset().top + timeCorrection;
 				var evtBottom = evtTop + evtHeight;
 				var evtLeft = TAB_LEFT + ($columnId * (params.cell_width + BORDER_CELL_LENGTH)) + 1;
 				if ($.browser.msie && parseInt($.browser.version, 10) === 9) {
@@ -660,6 +668,9 @@
                 tmpHour.addMinutes(15);
                 if (j % 2 == 1) {
                     span.className += " hourZebra"
+                }
+                if (j % 4 == 2 || j % 4 == 3) {
+                    span.className += " after30mins"
                 }
                 $day.append(span)
             }

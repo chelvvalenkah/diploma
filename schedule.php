@@ -101,10 +101,12 @@ $_SESSION['calendar_page'] = true;
                                                     AND lectures.status = 'ready'");
                 if ($lectures_result->num_rows > 0) {
                     while ($lectures_row = $lectures_result->fetch_assoc()) {
+                        /*
                         $time = explode(':', $lectures_row['time']);
                         $corr = $time[1]%15 > 10 ? 1 : 0;
                         $time[1] = (($time[1]/15|0) + $corr) * 15;
                         $lectures_row['time'] = implode(':', $time);
+                        */
                         $conf_event_string = "{ ".PHP_EOL.
                                                 "date: '".$lectures_row['date']."', ".PHP_EOL.
                                                 "start: '".$lectures_row['time']."', ".PHP_EOL.
@@ -123,7 +125,7 @@ $_SESSION['calendar_page'] = true;
 
             var conf_event = {
                 date: '2013-06-25',
-                start: '16:00',
+                start: '16:22',
                 length: 5,
                 name: 'TEST string long',
                 desc: 'This is test!!!',
