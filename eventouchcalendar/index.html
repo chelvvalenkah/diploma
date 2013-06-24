@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EvenTouch Calendar</title>
+    
+    <link rel="stylesheet" type="text/css" media="screen" href="./style.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./includes/shadowbox-3.0.3/shadowbox.css" />
+	<link rel="stylesheet" type="text/css" media="screen" href="./includes/jquery-minicolors/jquery.miniColors.css" />
+	
+	<!--[if lt IE 9]>
+        <script src="HTML5Shiv/html5.js"></script>
+        
+        <style type="text/css">
+            .ui-draggable-dragging {
+                filter: alpha(opacity=50);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+            }
+            
+            #agenda tbody span.ui-selecting {
+                background: #569DE8;
+                border-top: 1px solid #569DE8;
+            }
+            
+            #topMask {
+                position: absolute;
+                
+                background: #DDD;
+                
+                z-index: 10;
+                
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+            
+            #bottomMask {
+                position: absolute;
+                
+                background: #DDD;
+                
+                z-index: 10;
+                
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+            
+            #leftMask {
+                position: absolute;
+                
+                width: 0px;
+                
+                background: #DDD;
+                
+                z-index: 10;
+                
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+
+            #rightMask {
+                position: absolute;
+                
+                width: 0px;
+                
+                background: #DDD;
+                
+                z-index: 10;
+                
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+        </style>
+    <![endif]-->
+<meta charset="UTF-8"></head>
+<body>
+	<header>
+		<p>EvenTouch <span style="color:#327CCB;">Calendar</span></p>
+	</header>
+	<div id="container" style="margin:50px 0px 0px 100px;">
+		<!--
+		<div id="miniMonthCalendarContainer">
+			<h3 style="margin:0px 0px 15px 30px; color:#327CCB; font-size:14px;">Fast day chooser</h3>
+			<div id="monthManagement">
+				<input type="button" id="prevYear" name="prevYear" value="&laquo;" title="Previous year" />
+				<input type="button" id="prevMonth" name="prevMonth" value="&lt;" title="Previous month" />
+				<span id="currentMonth"></span>
+				<input type="button" id="nextMonth" name="prevMonth" value="&gt;" title="Next month" />
+				<input type="button" id="nextYear" name="nextYear" value="&raquo;" title="Next year" />
+			</div>
+			<table id="miniMonthCalendar">
+			</table>
+		</div>
+		-->
+		<div id="nav">
+			<input type="button" id="nav_previous" name="nav_previous" value="&lt;" title="Previous week" />
+			<input type="button" id="nav_next" name="nav_next" value="&gt;" title="Next week" />
+		</div>
+		<table id="hoursList"></table>
+		<div id="limitsChoice"></div>
+		<table id="agenda">
+			<thead>
+				<tr>
+					<!-- Days name -->
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<!-- TD of each days -->
+				</tr>
+				<div id="topMask"></div>
+				<div id="bottomMask"></div>
+				<div id="leftMask"></div>
+				<div id="rightMask"></div>
+			</tbody>
+		</table>
+		<div id="limitsChoiceHorizontal"></div>
+		<div id="fixResize"></div>
+	</div>
+	
+	<form id="formCreationEvt" style="display:none;">
+		<table>
+			<tbody>
+				<tr>
+					<td><label for="name">Name</label></td>
+				</tr>
+				<tr>
+					<td><input type="text" id="name" name="name" class="field" /></td>
+				</tr>
+				<tr>
+					<td><label for="desc">Description</label></td>
+				</tr>
+				<tr>
+					<td><textarea id="desc" name="desc" class="field" rows="2"></textarea></td>
+				</tr>
+				<tr>
+					<td><label for="color">Color</label></td>
+				</tr>
+				<tr>
+					<td><input id="colorChoose" type="text" class="color-picker field" value="#327CCB" style="width:60px; text-align:center;" /></td>
+				</tr>
+				<tr>
+					<td style="text-align:center;">
+						<input type="button" id="cancelCreationEvt" class="validate" value="CANCEL" />
+						<input type="button" id="valCreationEvt" class="validate" value="OK" />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center;">
+						<input type="button" id="delCreationEvt" class="validate" value="DELETE" style="width:303px;" disabled />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
+	
+	<script type='text/javascript' src='./includes/jquery-1.7.1.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery-ui-1.8.17.custom.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.core.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.widget.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.mouse.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.position.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.draggable.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.resizable.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.selectable.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.droppable.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.slider.min.js'></script>
+	<script type='text/javascript' src='./includes/jquery.ui.dialog.min.js'></script>
+
+	<!-- SHADOWBOX -->
+	<script type='text/javascript' src='./includes/shadowbox-3.0.3/shadowbox.js'></script>
+	
+	<!-- JQUERY - MINICOLORS -->
+	<script type='text/javascript' src='./includes/jquery-minicolors/jquery.miniColors.min.js'></script>
+	
+	<!-- DATES MANAGEMENT -->
+	<script type='text/javascript' src='./includes/date.js'></script>
+	
+	<script type='text/javascript' src='./eventouchcalendar.crypt.js'></script>
+	<script type="text/javascript">
+		//<![CDATA[
+		$(document).ready(function() {
+
+			// Example of good values for cells
+			var CELL_WIDTH_LITTLE = 100, CELL_WIDTH_MEDIUM = 150, CELL_WIDTH_LARGE = 200;
+			var CELL_HEIGHT_LITTLE = 7, CELL_HEIGHT_MEDIUM = 9, CELL_HEIGHT_LARGE = 15;
+			
+			/*
+				Default values
+				--------------
+			
+			hour_mask:		new Array(8, 20),
+			day_mask:		new Array(1, 7),
+			cell_width:		150,
+			cell_height:	9
+			*/
+			
+			var conf_event = {
+					date: '2013-06-25',
+					start: '16:00',
+					length: 5,
+					name: 'TEST string long',
+					desc: 'This is test!!!',
+					color: 'abcdef',
+					href: 'http://google.com'
+				};
+			
+			var conf_event2 = {
+					date: '2013-06-26',
+					start: '14:00',
+					length: 7,
+					name: 'TEST2',
+					desc: 'hui',
+					color: 'de1d43',
+					href: 'http://yandex.ua/'
+				};
+			
+			$agenda = $(document).eventouchcalendar({
+			
+			}, new Array(conf_event, conf_event2));
+			
+		});
+		//]]>
+	</script>
+</body>
+</html>
