@@ -18,6 +18,8 @@
             </div>
             <div class="span10">
 <? else: ?>
+    <? if (!isset($_SESSION['calendar_page'])): ?>
             <div class="span1"></div>
             <div class="span10">
+    <? endif; ?>
 <? endif; ?>

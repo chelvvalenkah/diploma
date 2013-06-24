@@ -73,15 +73,6 @@ function logout() {
     setcookie("PHPSESSID", "", time()-1);
 }
 
-/**
- * Checks POSTed input of registration form
- */
-function check_user_info($mysqli, &$emptyFields, &$wrongInput, &$errorMsg) {
-
-
-    return $user_data;
-}
-
 function print_status($status) {
     switch ($status) {
         case 'pending': return 'нерозглянута';

@@ -85,7 +85,7 @@
 						width: params.cell_width,
 						height: evtHeight,
 						top: evtTop,
-						left: evtLeft
+						left: evtLeft-2 /* "-2" = костыль; возможно, из-за Bootstrap'а */
 					});
 					var evt_lnk = document.createElement("a");
 					evt_lnk.className = 'div-link';
@@ -128,6 +128,7 @@
 				$(evt).append(evtName);
 				$(evt).append(evtDesc);
 			});
+            highlightEvents();
 		}
 		
         function selectionEnd(event, ui) {
@@ -321,7 +322,8 @@
             $("#hoursList").css({
                 width: HOURS_LIST_WIDTH,
                 marginRight: HOURS_LIST_MARGIN_RIGHT,
-                marginTop: TH_HEIGHT - 6
+                marginTop: TH_HEIGHT - 6,
+                lineHeight: HOUR_LIST_LINE_HEIGHT+'px'
             });
             $(".ui-slider-vertical").css("height", DIV_HEIGHT);
             $(".ui-slider-horizontal").css("width", TAB_WIDTH);
@@ -450,6 +452,7 @@
 		var HOURS_LIST_LEFT = $("#hoursList").offset().left;
 		var HOURS_LIST_WIDTH = 18;
 		var HOURS_LIST_MARGIN_RIGHT = 20;
+        var HOUR_LIST_LINE_HEIGHT = 16;
 		var SLIDER_VERTICAL_MARGIN_RIGHT = 30;
         var SLIDER_WIDTH = 2;
 		var SLIDER_OFFSET = 3;
@@ -461,10 +464,10 @@
             CELL_MIN_HEIGHT = 7;
 		var client_w=(1260 - HOURS_LIST_LEFT - HOURS_LIST_WIDTH - HOURS_LIST_MARGIN_RIGHT - SLIDER_VERTICAL_MARGIN_RIGHT - SLIDER_WIDTH - BORDER_CELL_LENGTH - SLIDER_OFFSET)/7;
         var defaults = {
-            hour_mask: new Array(8, 22),
-            day_mask: new Array(0, 7),
+            hour_mask: new Array(8, 20),
+            day_mask: new Array(1, 7),
             cell_width: 150,
-            cell_height: 5
+            cell_height: 9
         };
         var params = $.extend(defaults, params);
         params.cell_width = (params.cell_width < CELL_MIN_WIDTH) ? CELL_MIN_WIDTH : params.cell_width;

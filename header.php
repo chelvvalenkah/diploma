@@ -24,8 +24,82 @@ check_authorization($mysqli);
     <link rel="stylesheet" href="css/bootstrap.min.css" media="all" />
     <link rel="stylesheet" href="css/bootstrap-responsive.min.css" media="all" />
     <link href="css/style.css" rel="stylesheet" media="all" />
+
+    <? if (isset($_SESSION['calendar_page']) && $_SESSION['calendar_page']): ?>
+    <link rel="stylesheet" type="text/css" media="screen" href="./eventouchcalendar/style.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./eventouchcalendar/includes/shadowbox-3.0.3/shadowbox.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./eventouchcalendar/includes/jquery-minicolors/jquery.miniColors.css" />
+    <!--[if lt IE 9]>
+        <script src="./eventouchcalendar/html5.js"></script>
+
+        <style type="text/css">
+            .ui-draggable-dragging {
+                filter: alpha(opacity=50);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
+            }
+
+            #agenda tbody span.ui-selecting {
+                background: #569DE8;
+                border-top: 1px solid #569DE8;
+            }
+
+            #topMask {
+                position: absolute;
+
+                background: #DDD;
+
+                z-index: 10;
+
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+
+            #bottomMask {
+                position: absolute;
+
+                background: #DDD;
+
+                z-index: 10;
+
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+
+            #leftMask {
+                position: absolute;
+
+                width: 0px;
+
+                background: #DDD;
+
+                z-index: 10;
+
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+
+            #rightMask {
+                position: absolute;
+
+                width: 0px;
+
+                background: #DDD;
+
+                z-index: 10;
+
+                filter: alpha(opacity=60);
+                filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
+            }
+        </style>
+    <![endif]-->
+    <? endif; ?>
+
     <!-- We NEED these SCRIPTS! -->
+    <? if (isset($_SESSION['calendar_page']) && $_SESSION['calendar_page']): ?>
+    <script type='text/javascript' src='./eventouchcalendar/includes/jquery-1.7.1.min.js'></script>
+    <? else: ?>
     <script src="js/jquery-1.10.1.min.js"></script>
+    <? endif; ?>
     <!--<script src="http://code.jquery.com/jquery-latest.js"></script>-->
     <script src="js/bootstrap.min.js"></script>
 

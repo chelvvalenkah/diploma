@@ -8,7 +8,9 @@
  */
 
 ?>
+    <? if (!isset($_SESSION['calendar_page'])): ?>
             </div> <!-- /Page content -->
+    <? endif; ?>
 <? if (!sidebar): ?>
             </div> <!-- /Page content -->
             <div class="span1"></div>
