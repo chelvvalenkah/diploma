@@ -36,7 +36,7 @@ else {
 
 if ($_SESSION['mode'] != 'signup') $user = array();
 
-if (isset($_SESSION['auth'])) define('sidebar', true);
+if (isset($_SESSION['auth'])) define('sidebar', false);
 else define('sidebar', false);
 
 ?>
@@ -280,7 +280,7 @@ if ($_SESSION['mode'] != "signup") {
         <div class="form-actions">
             <? if ($_SESSION['mode'] == 'signup'): ?>
             <button type="submit" id="signupButton" class="btn btn-large btn-primary disabled" disabled="disabled">Зареєструватися</button>
-            <a href="<?=HOME_URL?>" id="backButton" class="btn btn-large">На головну</a>
+            <a href="<?=ROOT_URL?>" id="backButton" class="btn btn-large">На головну</a>
             <? elseif ($_SESSION['mode'] != 'edit'): ?>
             <? if ($_SESSION['mode'] == 'home'): ?>
             <a href="<?=PROFILE_URL.'?edit='.$_SESSION['requested_id']?>" id="editButton" class="btn btn-large btn-primary">Редагувати</a>

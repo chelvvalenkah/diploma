@@ -8,7 +8,7 @@
  */
 
 define('authNeeded', true);
-define('sidebar', true);
+define('sidebar', false);
 require_once('constants.php');
 if (session_status() != PHP_SESSION_ACTIVE) session_start(); # PHP >= 5.4.0
 

@@ -18,7 +18,7 @@ if (session_status() != PHP_SESSION_ACTIVE) session_start(); # PHP >= 5.4.0
                     <p id="message">Ця сторінка доступна лише для авторізованих користувачів.
                         Ви можете увійти або зареєструватися, щоб мати можливість її переглядати.</p>
                     <p id="buttons">
-                        <a class="btn btn-danger" href="<?=SIGNUP_URL?>">Зареєструватися</a> <a class="btn" href="<?=HOME_URL?>">На головну</a>
+                        <a class="btn btn-danger" href="<?=SIGNUP_URL?>">Зареєструватися</a> <a class="btn" href="<?=ROOT_URL?>">На головну</a>
                     </p>
                 </div>
 <? include_once('page_finish.php') ?>

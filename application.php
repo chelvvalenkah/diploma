@@ -29,7 +29,7 @@ else {
 
 if ($_SESSION['mode'] != 'new') $lecture = array();
 
-if (isset($_SESSION['auth'])) define('sidebar', true);
+if (isset($_SESSION['auth'])) define('sidebar', false);
 else define('sidebar', false);
 
 ?>
@@ -141,7 +141,12 @@ if ($_SESSION['mode'] == "view" || $_SESSION['mode'] == "edit") {
                             <label for="statusField" class="control-label">Статус заявки</label>
                             <div class="controls">
                                 <span id="statusField" class="<?=$_SESSION['mode'] == "edit" && $_SESSION['role'] != 'admin' ?
-                                    'input-xlarge ' : 'input-xxlarge '?> uneditable-input"><?=print_status($lecture['status'])?></span>
+                                    'input-xlarge ' : 'input-xxlarge '?> uneditable-input" title="Статус заявки редагується організаторами">
+                                    <?=print_status($lecture['status'])?>
+                                </span>
+                                <? if ($_SESSION['mode'] == "edit" && $_SESSION['role'] != 'admin'): ?>
+                                <span id="statusHelp" class="help-inline">Статус заявки редагується організаторами</span>
+                                <? endif; ?>
                             </div>
                         </div>
                         <? endif; ?>
@@ -156,9 +161,9 @@ if ($_SESSION['mode'] == "view" || $_SESSION['mode'] == "edit") {
                                 <? endif; ?>
                             </div>
                         </div>
-                    <? if (($_SESSION['role'] == 'admin' && ($lecture['status'] == 'approved' || $lecture['status'] == 'ready')) || ($lecture['status'] == 'ready' && $_SESSION['mode'] != 'new')): ?>
+                    <? if (($lecture['status'] == 'ready' && $_SESSION['mode'] == 'view') || ($_SESSION['role'] == 'admin' && $_SESSION['mode'] == 'edit' && ($lecture['status'] == 'approved' || $lecture['status'] == 'ready'))): ?>
                     </fieldset>
-                    <fieldset<?=$_SESSION['role'] != 'admin' ? ' class="viewable"' : ''?>>
+                    <fieldset<?=$_SESSION['mode'] == 'view' ? ' class="viewable"' : ''?>>
                         <legend>Час і місце</legend>
                         <div class="control-group">
                             <label for="dateField" class="control-label required">Дата</label>
@@ -188,7 +193,7 @@ if ($_SESSION['mode'] == "view" || $_SESSION['mode'] == "edit") {
                             </div>
                         </div>
                         <div class="control-group">
-                            <label for="timeField" class="control-label">Час</label>
+                            <label for="timeField" class="control-label required">Час</label>
                             <div class="controls">
                                 <? if ($_SESSION['role'] == 'admin' && $_SESSION['mode'] == 'edit'): ?>
                                 <input type="text" id="timeField" class="input-mini" name="time" required="required"
@@ -204,14 +209,15 @@ if ($_SESSION['mode'] == "view" || $_SESSION['mode'] == "edit") {
                             <label for="flowField" class="control-label required">Потік</label>
                             <div class="controls">
                                 <? if ($_SESSION['role'] == 'admin' && $_SESSION['mode'] == 'edit'): ?>
-                                <select id="flowField" class="span6" name="date" required="required" title="Виберіть потік зі списку">
+                                <select id="flowField" class="span6" name="flow" required="required" title="Виберіть потік зі списку">
                                     <option></option>
                                     <?php
-                                    $flows_result = $mysqli->query("SELECT ID, name, place FROM flows");
+                                    $flows_result = $mysqli->query("SELECT flows.ID, flows.name, venues.name AS place FROM flows
+                                                                    LEFT JOIN venues ON flows.venue_ID = venues.id");
                                     if ($flows_result->num_rows > 0):
                                         while ($flows = $flows_result->fetch_assoc()):
                                     ?>
-                                    <option value="<?=$flows['ID']?>"  <?=($lecture['status'] == 'ready' &&
+                                    <option value="<?=$flows['ID']?>" <?=($lecture['status'] == 'ready' &&
                                         $lecture['flow_ID'] == $flows['ID']) ? ' selected="selected"' : '' ?> data-place="<?=$flows['place']?>">
                                         <?=$flows['ID'].': '.$flows['name']?>
                                     </option>
@@ -243,17 +249,17 @@ if ($_SESSION['mode'] == "view" || $_SESSION['mode'] == "edit") {
                             <? if ($_SESSION['mode'] == "new"): ?>
                             <button type="submit" id="applyButton" class="btn btn-large btn-primary">Подати доповідь</button>
                             <? elseif ($_SESSION['mode'] == "edit" && ($_SESSION['role'] == 'speaker' ||
-                            ($_SESSION['role'] != 'admin' && ($lecture['status'] == 'approved' || $lecture['status'] == 'ready')))): ?>
+                            ($_SESSION['role'] == 'admin' && ($lecture['status'] == 'approved' || $lecture['status'] == 'ready')))): ?>
                             <button type="submit" id="saveButton" class="btn btn-large btn-primary">Зберігти</button>
                             <input type="hidden" name="lectureID" value="<?=$_SESSION['requested_id']?>" />
                             <? elseif ($lecture['speaker_ID'] == $_SESSION['userID'] && $lecture['status'] != 'ready'): ?>
                             <a href="<?=APPLY_URL.'?edit='.$_SESSION['requested_id']?>" id="editButton" class="btn btn-large btn-primary">Редагувати</a>
-                            <? endif; ?>
-                            <? if ($_SESSION['stage'] == 'registration' && $lecture['speaker_ID'] != $_SESSION['userID'] && $_SESSION['role'] != 'admin'): ?>
+                            <? elseif ($_SESSION['mode'] == "view" && $lecture['status'] == 'ready' && STAGE == 'registration'
+                                && $lecture['speaker_ID'] != $_SESSION['userID'] && $_SESSION['role'] != 'admin'): ?>
                             <button type="submit" id="registerButton" class="btn btn-large btn-primary">Зареєструватися</button>
                             <? endif; ?>
                             <a href="<?=LECTURES_URL?>" id="backButton" class="btn btn-large">Назад</a>
-                            <input type="hidden" name="mode" value="<?=$_SESSION['stage'] == 'registration' ? 'register' : $_SESSION['mode']?>" />
+                            <input type="hidden" name="mode" value="<?=STAGE == 'registration' && $lecture['status'] == 'ready' ? 'register' : $_SESSION['mode']?>" />
                         </div>
                     </fieldset>
                 </form>

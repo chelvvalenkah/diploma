@@ -121,7 +121,7 @@ check_authorization($mysqli);
                 </div>
                 <div class="span4">
                     <blockquote>
-                        <strong>Всеукраїнська ледарська конференція &laquo;<?=CONF_NAME?>&raquo;</strong>
+                        <strong><?=CONF_SUBNAME?> &laquo;<?=CONF_NAME?>&raquo;</strong>
                         <small><em><?=CONF_PLACE.", ".CONF_DATES?></em></em></small>
                     </blockquote>
                 </div>
@@ -189,13 +189,18 @@ check_authorization($mysqli);
             </div>
             <div class="navbar">
                 <div class="navbar-inner">
-                    <a class="brand" href="#"><?=CONF_NAME?></a>
+                    <a class="brand" href="<?=ROOT_URL?>"><?=CONF_NAME?></a>
                     <ul class="nav">
-                        <li<? if ($_SERVER['SCRIPT_NAME'] == INDEX_URL) echo ' class="active"' ?>><a href="<?=HOME_URL?>">Головна</a></li>
-                        <li<? if ($_SERVER['SCRIPT_NAME'] == SIGNUP_URL) echo ' class="active"' ?>><a href="<?=SIGNUP_URL?>">Реєстрація</a></li>
-                        <li<? if ($_SERVER['SCRIPT_NAME'] == APPLY_URL) echo ' class="active"' ?>><a href="<?=APPLY_URL?>">Подати доповідь</a></li>
-                        <li<? if ($_SERVER['SCRIPT_NAME'] == LECTURES_URL) echo ' class="active"' ?>><a href="<?=LECTURES_URL?>">Лекції</a></li>
-                        <li><a href="#">Link</a></li>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == ROOT_URL) echo ' class="active"' ?>><a href="<?=ROOT_URL?>">Головна</a></li>
+                        <? if (!arg_exists_not_null($_SESSION['auth'])): ?>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == PROFILE_URL && $_SERVER['QUERY_STRING'] == 'signup') echo ' class="active"' ?>><a href="<?=SIGNUP_URL?>">Реєстрація</a></li>
+                        <? else: ?>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == PROFILE_URL && $_SERVER['QUERY_STRING'] == '') echo ' class="active"' ?>><a href="<?=PROFILE_URL?>">Профіль</a></li>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == LECTURES_URL || ($_SERVER['SCRIPT_NAME'] == APPLY_URL &&
+                            (arg_exists_not_null($_GET['view']) || arg_exists_not_null($_GET['edit'])))) echo ' class="active"' ?>><a href="<?=LECTURES_URL?>">Доповіді</a></li>
+                        <? endif; ?>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == SCHEDULE_URL) echo ' class="active"' ?>><a href="<?=SCHEDULE_URL?>">Розклад</a></li>
+                        <li<? if ($_SERVER['SCRIPT_NAME'] == APPLY_URL && $_SERVER['QUERY_STRING'] == '') echo ' class="active"' ?>><a href="<?=APPLY_URL?>">Подати доповідь</a></li>
                     </ul>
                 </div>
             </div>
@@ -237,7 +242,7 @@ check_authorization($mysqli);
                     $('#header-container').load('<?=$_SERVER['SCRIPT_NAME']?> #header', function() {
                         eval($('script#headerJS').text());
                     });
-<? if (authNeeded): ?>
+<?/* if (authNeeded): */?>
                     $('#page-container').load('<?=$_SERVER['REQUEST_URI']?> #page', function(responseText, textStatus, XMLHttpRequest) {
                         if (!$('script#pageJS').length && $('script#pageJS', responseText).length) {
                             var js = document.createElement('script');
@@ -248,8 +253,7 @@ check_authorization($mysqli);
                         else eval($('script#pageJS').text());
                         //console.log(responseText);
                     });
-
-<? endif; ?>
+<?/* endif; */?>
                     $('#headerAJAXresponseLabel').text(data.title);
                     $('#headerAJAXresponse div.modal-body p').text(data.msg);
                     $('#headerAJAXresponse').modal('show');

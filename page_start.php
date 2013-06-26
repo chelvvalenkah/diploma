@@ -7,6 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
+require_once('constants.php');
+
 ?>
     <div id="page-container">
         <div id="page" class="row-fluid">
@@ -18,7 +20,7 @@
             </div>
             <div class="span10">
 <? else: ?>
-    <? if (!isset($_SESSION['calendar_page'])): ?>
+    <? if (!isset($_SESSION['calendar_page']) && $_SERVER['SCRIPT_NAME'] != HOME_PAGE): ?>
             <div class="span1"></div>
             <div class="span10">
     <? endif; ?>

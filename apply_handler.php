@@ -45,16 +45,10 @@ else {
             $emptyFields[] = "Доповідач";
         }
         else {
-            $author = $mysqli->real_escape_string($_POST['author']);
-            $author_result = $mysqli->query("SELECT id, CONCAT_WS(' ', surname, name) AS userName FROM participants WHERE ID = '$author'");
-            if ($author_result->num_rows > 0) {
-                $author_row = $author_result->fetch_assoc();
-                if ($author_row['id'] == $_SESSION['userID']) {
-                    $report_data['speaker_ID'] = $author;
-                }
-                else $errorMsg[] = "Ви можете подавати доповіді лише від свого імені!";
+            if ($_POST['author'] != $_SESSION['userName']) {
+                $errorMsg[] = "Ви можете подавати доповіді лише від свого імені!";
             }
-            else $errorMsg[] = "Такий доповідач не зареєстрований!";
+            else $report_data['speaker_ID'] = $_SESSION['userID'];
         }
 
         if (!arg_exists_not_null($_POST['duration'])) {
@@ -73,48 +67,76 @@ else {
         }
 
         # Generating MySQL request
-        if ($_SESSION['role'] == 'admin')
-        if (!isset($emptyFields) && !isset($wrongInput) && !isset($errorMsg)) { # если проверка прошла успешно
-            $fields = "(";
-            $values = "(";
-            if ($_POST['mode'] == 'edit') {
-                if ($mysqli->query("SELECT * FROM lectures WHERE ID = '".$mysqli->real_escape_string($_POST['lectureID'])."' AND speaker_ID = '"
-                    .$mysqli->real_escape_string($_SESSION['userID'])."'")->num_rows > 0) {
-                    if (!$mysqli->query("DELETE FROM lectures WHERE ID = {$_POST['lectureID']}")) {
-                        header("HTTP/1.1 500 Internal Server Error");
-                        $errors['errorMsg'] = "Помилка при роботі з базою даних. Спробуйте пізніше.";
+        if ($_SESSION['role'] != 'admin') {
+            if (!isset($emptyFields) && !isset($wrongInput) && !isset($errorMsg)) { # если проверка прошла успешно
+                $fields = "(";
+                $values = "(";
+                if ($_POST['mode'] == 'edit') {
+                    if ($mysqli->query("SELECT * FROM lectures WHERE ID = '".$mysqli->real_escape_string($_POST['lectureID'])."' AND speaker_ID = '"
+                        .$mysqli->real_escape_string($_SESSION['userID'])."'")->num_rows > 0) {
+                        if (!$mysqli->query("DELETE FROM lectures WHERE ID = {$_POST['lectureID']}")) {
+                            header("HTTP/1.1 500 Internal Server Error");
+                            $errors['errorMsg'] = "Помилка при роботі з базою даних. Спробуйте пізніше.";
+                            echo json_encode($errors);
+                            exit;
+                        }
+                        $fields .= 'ID, ';
+                        $values .= $mysqli->real_escape_string($_POST['lectureID']).', ';
+                    }
+                    else {
+                        header("HTTP/1.1 400 Bad Request");
+                        $errors['errorMsg'] = "Ви не маєте права редагувати цю доповідь!";
                         echo json_encode($errors);
                         exit;
                     }
-                    $fields .= 'ID, ';
-                    $values .= $mysqli->real_escape_string($_POST['lectureID']).', ';
+                }
+                foreach ($report_data as $column=>$data) {
+                    $fields .= $column.", ";
+                    $values .= "'".$mysqli->real_escape_string($data)."', ";
+                }
+                $fields = substr($fields, 0, strlen($fields)-2).")";
+                $values = substr($values, 0, strlen($values)-2).")";
+                if (($_SESSION['role'] == 'speaker' || $mysqli->query("UPDATE participants SET role = 'speaker' WHERE ID = {$_SESSION['userID']}"))
+                    && $mysqli->query("INSERT INTO $table $fields VALUES $values")) {
+                    $_SESSION['role'] = 'speaker';
+                    header("HTTP/1.1 200 OK");
+                    $response['title'] = "Вітаємо, {$_SESSION['userName']}!";
+                    if ($_POST['mode'] == 'new') {
+                        $response['msg'] = "Вашу заявку щодо доповіді на конференції ".CONF_NAME." зареєстровано!
+                    Статус заявки можна переглянути в особистому кабінеті.";
+                    }
+                    elseif ($_POST['mode'] == 'edit') {
+                        $response['msg'] = "Вашу заявку щодо доповіді на конференції ".CONF_NAME." відредаговано!
+                    Статус заявки можна переглянути в особистому кабінеті.";
+                    }
+                    echo json_encode($response);
+                    exit;
                 }
                 else {
-                    header("HTTP/1.1 400 Bad Request");
-                    $errors['errorMsg'] = "Ви не маєте права редагувати цю доповідь!";
+                    header("HTTP/1.1 500 Internal Server Error");
+                    $errors['errorMsg'] = "Помилка при роботі з базою даних. Спробуйте пізніше.";
                     echo json_encode($errors);
                     exit;
                 }
             }
-            foreach ($report_data as $column=>$data) {
-                $fields .= $column.", ";
-                $values .= "'".$mysqli->real_escape_string($data)."', ";
+            else {
+                header("HTTP/1.1 400 Bad Request");
+                if (isset($emptyFields)) $errors['emptyFields'] = $emptyFields;
+                if (isset($wrongInput)) $errors['wrongInput'] = $wrongInput;
+                if (isset($errorMsg)) $errors['errorMsg'] = $errorMsg;
+                echo json_encode($errors);
+                exit;
             }
-            $fields = substr($fields, 0, strlen($fields)-2).")";
-            $values = substr($values, 0, strlen($values)-2).")";
-            if ($mysqli->query("UPDATE participants SET role = 'speaker' WHERE ID = {$_SESSION['userID']}") &&
-                $mysqli->query("INSERT INTO $table $fields VALUES $values")) {
-                $_SESSION['role'] = 'speaker';
+        }
+        else {
+            $ok = true;
+            $ok = $mysqli->query("UPDATE lectures SET date_ID = '{$_POST['date']}' WHERE ID = {$_POST['lectureID']}");
+            $ok = $mysqli->query("UPDATE lectures SET time = '{$_POST['time']}' WHERE ID = {$_POST['lectureID']}");
+            $ok = $mysqli->query("UPDATE lectures SET flow_ID = '{$_POST['flow']}' WHERE ID = {$_POST['lectureID']}");
+            if ($ok) {
                 header("HTTP/1.1 200 OK");
                 $response['title'] = "Вітаємо, {$_SESSION['userName']}!";
-                if ($_POST['mode'] == 'new') {
-                    $response['msg'] = "Вашу заявку щодо доповіді на конференції ".CONF_NAME." зареєстровано!
-                    Статус заявки можна переглянути в особистому кабінеті.";
-                }
-                elseif ($_POST['mode'] == 'edit') {
-                    $response['msg'] = "Вашу заявку щодо доповіді на конференції ".CONF_NAME." відредаговано!
-                    Статус заявки можна переглянути в особистому кабінеті.";
-                }
+                $response['msg'] = "Доповідь успішно додано в розклад конференції ".CONF_NAME."!";
                 echo json_encode($response);
                 exit;
             }
@@ -124,14 +146,6 @@ else {
                 echo json_encode($errors);
                 exit;
             }
-        }
-        else {
-            header("HTTP/1.1 400 Bad Request");
-            if (isset($emptyFields)) $errors['emptyFields'] = $emptyFields;
-            if (isset($wrongInput)) $errors['wrongInput'] = $wrongInput;
-            if (isset($errorMsg)) $errors['errorMsg'] = $errorMsg;
-            echo json_encode($errors);
-            exit;
         }
     }
 

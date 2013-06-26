@@ -8,17 +8,25 @@
  */
 
 define('CONF_NAME', 'EasyConf 2013', true);
-define('CONF_PLACE', 'Київ, НТУУ "КПІ"', true);
-define('CONF_DATES', '21-26 червня 2013', true);
-define('HOME_URL', '/', true);
-define('INDEX_URL', HOME_URL.'index.php', true);
-define('PROFILE_URL', HOME_URL.'profile.php', true);
+define('CONF_SUBNAME', 'Всеукраїнська студентська конференція', true);
+define('CONF_PLACE', 'НТУУ "КПІ", м. Київ', true);
+define('CONF_DATES', '24-30 червня 2013', true);
+define('CONF_DESC', CONF_SUBNAME.' «'.CONF_NAME.'» - це конференція, доступна для кожного студента.
+ У нас Ви можете не хвилюватись через те, що Ви ще новачок чи недостатньо талановиті,
+  адже поряд з Вам такі ж студенти, як і Ви! <br />Не відкладай на `завтра` - отримай новий досвід,
+   знання та цікаві знайомства вже сьогодні!', true);
+define('STAGE', 'registration', true);
+define('ROOT_URL', '/', true);
+define('HOME_PAGE', ROOT_URL.'home.php', true);
+define('PROFILE_URL', ROOT_URL.'profile.php', true);
 define('SIGNUP_URL', PROFILE_URL.'?signup', true);
-define('APPLY_URL', HOME_URL.'application.php', true);
-define('LECTURES_URL', HOME_URL.'lectures.php', true);
-define('FLOW_URL', HOME_URL.'flow.php', true);
-define('PROFILE_SCRIPT', HOME_URL.'profile_handler.php', true);
-define('APPLY_SCRIPT', HOME_URL.'apply_handler.php', true);
-define('LECTURES_SCRIPT', HOME_URL.'lectures_handler', true);
+define('APPLY_URL', ROOT_URL.'application.php', true);
+define('LECTURES_URL', ROOT_URL.'lectures.php', true);
+define('FLOW_URL', ROOT_URL.'flow.php', true);
+define('SCHEDULE_URL', ROOT_URL.'schedule.php', true);
+define('PROFILE_SCRIPT', ROOT_URL.'profile_handler.php', true);
+define('APPLY_SCRIPT', ROOT_URL.'apply_handler.php', true);
+define('LECTURES_SCRIPT', ROOT_URL.'lectures_handler.php', true);
+
 
 ?>

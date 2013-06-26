@@ -56,6 +56,7 @@
 		function createEvents() {
 			conf_events.forEach(function(conf_event) {
 			/*for (var conf_event in conf_events) {*/
+                //start correction
                 var time = conf_event.start.split(':');
                 var height_5mins = params.cell_height/3;
                 var timeCorrection = ((time[1] - (time[1]/15|0)*15)/5|0)*height_5mins;
@@ -64,9 +65,16 @@
                 time[1] = (time[1]/15|0)*15;
                 if (time[1] < 10) time[1] = '0'+time[1];
                 conf_event.start = time.join(':');
+                //duration correction
+                var duration = conf_event.length;
+                var heightCorrection = ((duration - (duration/15|0)*15)/5|0)*height_5mins;
+                if (duration - (((duration/15|0)*15)+heightCorrection/3*5) >= 3) heightCorrection += height_5mins;
+                heightCorrection += BORDER_CELL_LENGTH;
+                conf_event.length = duration/15|0;
+
 				var groupLength = conf_event.length;
 				var $columnId = $("#agenda tbody tr td").index($('td[data-date="'+conf_event.date+'"]'));
-				var evtHeight = groupLength * (params.cell_height + BORDER_CELL_LENGTH) - 2 * BORDER_CELL_LENGTH;
+				var evtHeight = groupLength * (params.cell_height + BORDER_CELL_LENGTH) - 2 * BORDER_CELL_LENGTH + heightCorrection;
 				var evtTop = $('#agenda tbody tr td').eq($columnId).find('span[data-time="'+conf_event.start+'"]').offset().top + timeCorrection;
 				var evtBottom = evtTop + evtHeight;
 				var evtLeft = TAB_LEFT + ($columnId * (params.cell_width + BORDER_CELL_LENGTH)) + 1;
@@ -507,7 +515,7 @@
         /*var BORDER_CELL_LENGTH = 1;*/
         var DIV_HEIGHT = LINES_NUMBER * (params.cell_height + BORDER_CELL_LENGTH);
         var EVT_MIN_HEIGHT = params.cell_height - BORDER_CELL_LENGTH;
-        var DISPLAYED_CHAR_COUNT = 15;
+        var DISPLAYED_CHAR_COUNT = 21;
         /*var HOURS_LIST_LEFT = $("#hoursList").offset().left;
         var HOURS_LIST_WIDTH = 18;
         var HOURS_LIST_MARGIN_RIGHT = 20;

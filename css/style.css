@@ -71,7 +71,7 @@ span.uneditable-input {
     cursor: auto;
 }
 
-span#authorField.uneditable-input {
+span#authorField.uneditable-input, span#statusField.uneditable-input {
     cursor: help;
 }
 
@@ -158,7 +158,7 @@ table th:not(.unsortable):hover {
 
 table th.unsortable:hover {
     color: #000;
-    cursor: normal;
+    cursor: auto;
 }
 
 .dropdown span.by:after, .dropup span.by:after {

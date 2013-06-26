@@ -7,22 +7,42 @@
  * To change this template use File | Settings | File Templates.
  */
 
-define('authNeeded', true);
 define('sidebar', false);
 require_once('connect.php');
 require_once('constants.php');
+require_once('functions.php');
 if (session_status() != PHP_SESSION_ACTIVE) session_start(); # PHP >= 5.4.0
 $_SESSION['calendar_page'] = true;
+
+if (arg_exists_not_null($_GET['events']) && ($_GET['events'] == 'all' || $_GET['events'] == 'own')) {
+    if ($_SESSION['role'] != 'admin') $_SESSION['mode'] = $_GET['events'];
+    else $_SESSION['mode'] = 'all';
+}
+else $_SESSION['mode'] = "all";
+if ($_SESSION['mode'] == 'own') define('authNeeded', true);
+else define('authNeeded', false);
 
 ?>
 <? include_once('header.php'); ?>
 <? if (!authNeeded || (authNeeded && isset($_SESSION['auth']))): ?>
 <? include_once('page_start.php') ?>
                 <!-- Page content -->
+                <!--
                 <div id="nav">
                     <input type="button" id="nav_previous" name="nav_previous" value="&lt;" title="Previous week" />
                     <input type="button" id="nav_next" name="nav_next" value="&gt;" title="Next week" />
                 </div>
+                -->
+
+                <? if (arg_exists_not_null($_SESSION['auth']) && $_SESSION['role'] != 'admin'): ?>
+                <div class="row-fluid text-center">
+                    <div class="btn-group btn-block" data-toggle="buttons-radio" data-toggle-name="scheduleRadio">
+                        <a href="<?=SCHEDULE_URL?>?events=own" class="btn<?=$_SESSION['mode'] == "own" ? ' active' : ''?>" name="own">Мій розклад</a>
+                        <a href="<?=SCHEDULE_URL?>?events=all" class="btn<?=$_SESSION['mode'] == "all" ? ' active' : ''?>" name="all">Загальний розклад</a>
+                    </div>
+                </div>
+                <? endif; ?>
+
                 <table id="hoursList"></table>
                 <div id="limitsChoice"></div>
                 <table id="agenda">
@@ -89,61 +109,88 @@ $_SESSION['calendar_page'] = true;
             var conf_events = new Array();
 
             <?php
-            if ($_SESSION['role'] == 'speaker') {
+            if ($_SESSION['mode'] == 'all') {
                 $lectures_result = $mysqli->query("SELECT lectures.id, lectures.title, lectures.duration,
                                                     DATE_FORMAT(dates.date, '%Y-%m-%e') AS date,
                                                     DATE_FORMAT(lectures.time, '%H:%i') AS time
                                                     FROM lectures
                                                     LEFT JOIN participants ON lectures.speaker_ID = participants.ID
                                                     LEFT JOIN dates ON lectures.date_ID = dates.ID
-                                                    LEFT JOIN flows ON lectures.flow_ID = flows.ID
+                                                    WHERE lectures.status = 'ready'");
+                if ($lectures_result->num_rows > 0) {
+                    $num = 0;
+                    while ($lectures_row = $lectures_result->fetch_assoc()) {
+                        $conf_event_string = "{ ".PHP_EOL.
+                            "date: '".$lectures_row['date']."', ".PHP_EOL.
+                            "start: '".$lectures_row['time']."', ".PHP_EOL.
+                            "length: '".$lectures_row['duration']."', ".PHP_EOL.
+                            "name: '".$lectures_row['title']."', ".PHP_EOL.
+                            "color: '".($num%2 == 1 ? '5bb75b' : '327CCB')."', ".PHP_EOL.
+                            "href: '".APPLY_URL.'?view='.$lectures_row['id']."' ".PHP_EOL.
+                            "}";
+                        ?> conf_events.push(<?=$conf_event_string?>); <?
+                        $num++;
+                    }
+                }
+            }
+            elseif (arg_exists_not_null($_SESSION['auth'])) {
+                if ($_SESSION['role'] == 'speaker') {
+                    $lectures_result = $mysqli->query("SELECT lectures.id, lectures.title, lectures.duration,
+                                                    DATE_FORMAT(dates.date, '%Y-%m-%e') AS date,
+                                                    DATE_FORMAT(lectures.time, '%H:%i') AS time
+                                                    FROM lectures
+                                                    LEFT JOIN participants ON lectures.speaker_ID = participants.ID
+                                                    LEFT JOIN dates ON lectures.date_ID = dates.ID
                                                     WHERE lectures.speaker_ID = {$_SESSION['userID']}
                                                     AND lectures.status = 'ready'");
-                if ($lectures_result->num_rows > 0) {
-                    while ($lectures_row = $lectures_result->fetch_assoc()) {
-                        /*
-                        $time = explode(':', $lectures_row['time']);
-                        $corr = $time[1]%15 > 10 ? 1 : 0;
-                        $time[1] = (($time[1]/15|0) + $corr) * 15;
-                        $lectures_row['time'] = implode(':', $time);
-                        */
-                        $conf_event_string = "{ ".PHP_EOL.
-                                                "date: '".$lectures_row['date']."', ".PHP_EOL.
-                                                "start: '".$lectures_row['time']."', ".PHP_EOL.
-                                                "length: '".($lectures_row['duration']/15|0)."', ".PHP_EOL.
-                                                "name: '".$lectures_row['title']."', ".PHP_EOL.
-                                                "color: 'abcdef', ".PHP_EOL.
-                                                "href: '".APPLY_URL.'?view='.$lectures_row['id']."' ".PHP_EOL.
-                                                "}";
-                        ?> conf_events.push(<?=$conf_event_string?>); <?
+                    if ($lectures_result->num_rows > 0) {
+                        while ($lectures_row = $lectures_result->fetch_assoc()) {
+                            /*
+                            $time = explode(':', $lectures_row['time']);
+                            $corr = $time[1]%15 > 10 ? 1 : 0;
+                            $time[1] = (($time[1]/15|0) + $corr) * 15;
+                            $lectures_row['time'] = implode(':', $time);
+                            */
+                            $conf_event_string = "{ ".PHP_EOL.
+                                "date: '".$lectures_row['date']."', ".PHP_EOL.
+                                "start: '".$lectures_row['time']."', ".PHP_EOL.
+                                "length: '".$lectures_row['duration']."', ".PHP_EOL.
+                                "name: '".$lectures_row['title']."', ".PHP_EOL.
+                                "color: 'de1d43', ".PHP_EOL.
+                                "href: '".APPLY_URL.'?view='.$lectures_row['id']."' ".PHP_EOL.
+                                "}";
+                            ?> conf_events.push(<?=$conf_event_string?>); <?
+                        }
+                    }
+                }
+                if ($_SESSION['role'] != 'admin') {
+                    $lectures_result = $mysqli->query("SELECT lectures.id, lectures.title, lectures.duration,
+                                                        DATE_FORMAT(dates.date, '%Y-%m-%e') AS date,
+                                                        DATE_FORMAT(lectures.time, '%H:%i') AS time
+                                                        FROM registrations
+                                                        LEFT JOIN lectures ON registrations.lecture_ID = lectures.ID
+                                                        LEFT JOIN participants ON lectures.speaker_ID = participants.ID
+                                                        LEFT JOIN dates ON lectures.date_ID = dates.ID
+                                                        WHERE registrations.visitor_ID = '{$_SESSION['userID']}'
+                                                        ORDER BY date, time");
+                    if ($lectures_result->num_rows > 0) {
+                        while ($lectures_row = $lectures_result->fetch_assoc()) {
+                            $conf_event_string = "{ ".PHP_EOL.
+                                "date: '".$lectures_row['date']."', ".PHP_EOL.
+                                "start: '".$lectures_row['time']."', ".PHP_EOL.
+                                "length: '".$lectures_row['duration']."', ".PHP_EOL.
+                                "name: '".$lectures_row['title']."', ".PHP_EOL.
+                                "color: '327CCB', ".PHP_EOL.
+                                "href: '".APPLY_URL.'?view='.$lectures_row['id']."' ".PHP_EOL.
+                                "}";
+                            ?> conf_events.push(<?=$conf_event_string?>); <?
+                        }
                     }
                 }
             }
 
+
             ?>
-
-
-            var conf_event = {
-                date: '2013-06-25',
-                start: '16:22',
-                length: 5,
-                name: 'TEST string long',
-                desc: 'This is test!!!',
-                color: 'abcdef',
-                href: 'http://google.com'
-            };
-            conf_events.push(conf_event);
-
-            var conf_event2 = {
-                date: '2013-06-26',
-                start: '14:00',
-                length: 7,
-                name: 'TEST2',
-                desc: 'hui',
-                color: 'de1d43',
-                href: 'http://yandex.ua/'
-            };
-            conf_events.push(conf_event2);
 
             $agenda = $(document).eventouchcalendar({
                 hour_mask: new Array(6, 24),
@@ -156,7 +203,7 @@ $_SESSION['calendar_page'] = true;
         //]]>
     </script>
 
-    <!-- Some scripts -->
+    <!-- Schedule scripts -->
     <script type="text/javascript" id="pageJS">
 
     </script>

@@ -7,8 +7,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+require_once('constants.php');
+
 ?>
-    <? if (!isset($_SESSION['calendar_page'])): ?>
+    <? if (!isset($_SESSION['calendar_page']) && $_SERVER['SCRIPT_NAME'] != HOME_PAGE): ?>
             </div> <!-- /Page content -->
     <? endif; ?>
 <? if (!sidebar): ?>

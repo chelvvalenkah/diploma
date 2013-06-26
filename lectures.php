@@ -8,7 +8,7 @@
  */
 
 define('authNeeded', true);
-define('sidebar', true);
+define('sidebar', false);
 require_once('constants.php');
 require_once('functions.php');
 if (session_status() != PHP_SESSION_ACTIVE) session_start(); # PHP >= 5.4.0
@@ -151,10 +151,8 @@ else {
                                     <input type="hidden" name="action" value="undefined" />
                                     <button type="submit" class="btn btn-success" name="approved" disabled="disabled"><i class="icon-ok"></i> Прийняти</button>
                                     <button type="submit" class="btn btn-danger" name="rejected" disabled="disabled"><i class="icon-remove"></i> Відхилити</button>
-                                    <button type="button" onclick="location.href='<?=APPLY_URL.'?edit='.$_SESSION['requested_id']?>'"
-                                            class="btn btn-primary hide" name="addSchedule" disabled="disabled"><i class="icon-th-list"></i> Додати в розклад</button>
-                                    <button type="button" onclick="location.href='<?=APPLY_URL.'?edit='.$_SESSION['requested_id']?>'"
-                                            class="btn btn-primary" name="editSchedule" disabled="disabled"><i class="icon-refresh"></i> Редагувати</button>
+                                    <a href="#" class="btn btn-primary disabled hide" name="addSchedule"><i class="icon-th-list"></i> Додати в розклад</a>
+                                    <a href="#" class="btn btn-primary disabled" name="editSchedule"><i class="icon-refresh"></i> Редагувати</a>
                                 </form>
                             </div>
                         <? endfor; ?>
@@ -239,8 +237,7 @@ else {
                             <input type="hidden" name="action" value="undefined" />
                             <button type="submit" class="btn btn-success" name="pending" disabled="disabled"><i class="icon-ok"></i> Подати знову</button>
                             <button type="submit" class="btn btn-danger" name="withdrawn" disabled="disabled"><i class="icon-remove"></i> Відкликати</button>
-                            <a href="#"
-                                    class="btn btn-primary disabled" name="edit"><i class="icon-refresh"></i> Редагувати</a>
+                            <a href="#" class="btn btn-primary disabled" name="edit"><i class="icon-refresh"></i> Редагувати</a>
                         </form>
                     </div>
                 </div>
@@ -451,9 +448,17 @@ else {
         }
 
         function enableLink(button) {
-            button.attr('href', "<?=APPLY_URL.'?edit='?>"+
-                    $('div#speakerApplications form.tableForm input[name=lectureID]').val());
+            if (button.parents('div#speakerApplications').length) {
+                var id = $('div#speakerApplications form.tableForm input[name=lectureID]').val();
+            }
+            else var id = $('div.tab-pane.active form.tableForm input[name=lectureID]').val();
+            button.attr('href', "<?=APPLY_URL.'?edit='?>"+id);
             button.removeClass('disabled').unbind('click');
+        }
+
+        function insertLectureID(button) {
+            var id = $('div.tab-pane.active form.tableForm input[name=lectureID]').val();
+            button.attr('href', "<?=APPLY_URL.'?edit='?>"+id);
         }
 
         // Controlling form controls buttons
@@ -474,43 +479,48 @@ else {
                     case 'pending': {
                         jqControlsButtons.filter('button[name=approved]').prop('disabled', false);
                         jqControlsButtons.filter('button[name=rejected]').prop('disabled', false);
-                        jqControlsButtons.filter('button[name=addSchedule]').prop('disabled', true);
-                        $(this).parents('div.tab-pane').find('button[name=editSchedule]').addClass('hide');
-                        $(this).parents('div.tab-pane').find('button[name=addSchedule]').removeClass('hide');
+                        //jqControlsButtons.filter('a[name=addSchedule]').prop('disabled', true);
+                        disableLink(jqControlsButtons.filter('a[name=addSchedule]'));
+                        $(this).parents('div.tab-pane').find('a[name=editSchedule]').addClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=addSchedule]').removeClass('hide');
                         break;
                     }
                     case 'approved': {
                         jqControlsButtons.filter('button[name=approved]').prop('disabled', true);
                         jqControlsButtons.filter('button[name=rejected]').prop('disabled', false);
-                        jqControlsButtons.filter('button[name=addSchedule]').prop('disabled', false);
+                        //jqControlsButtons.filter('a[name=addSchedule]').prop('disabled', false);
+                        enableLink(jqControlsButtons.filter('a[name=addSchedule]'));
                         /*$(this).parents('div.tab-pane').find('button[name=addSchedule]').addClass('hide');
                         $(this).parents('div.tab-pane').find('button[name=editSchedule]').removeClass('hide');*/
-                        $(this).parents('div.tab-pane').find('button[name=editSchedule]').addClass('hide');
-                        $(this).parents('div.tab-pane').find('button[name=addSchedule]').removeClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=editSchedule]').addClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=addSchedule]').removeClass('hide');
                         break;
                     }
                     case 'rejected': {
                         jqControlsButtons.filter('button[name=approved]').prop('disabled', false);
                         jqControlsButtons.filter('button[name=rejected]').prop('disabled', true);
-                        jqControlsButtons.filter('button[name=editSchedule]').prop('disabled', true);
-                        $(this).parents('div.tab-pane').find('button[name=addSchedule]').addClass('hide');
-                        $(this).parents('div.tab-pane').find('button[name=editSchedule]').removeClass('hide');
+                        //jqControlsButtons.filter('button[name=editSchedule]').prop('disabled', true);
+                        disableLink(jqControlsButtons.filter('button[name=editSchedule]'));
+                        $(this).parents('div.tab-pane').find('a[name=addSchedule]').addClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=editSchedule]').removeClass('hide');
                         break;
                     }
                     case 'ready': {
                         jqControlsButtons.filter('button[name=approved]').prop('disabled', true);
                         jqControlsButtons.filter('button[name=rejected]').prop('disabled', false);
-                        jqControlsButtons.filter('button[name=editSchedule]').prop('disabled', false);
-                        $(this).parents('div.tab-pane').find('button[name=addSchedule]').addClass('hide');
-                        $(this).parents('div.tab-pane').find('button[name=editSchedule]').removeClass('hide');
+                        //jqControlsButtons.filter('a[name=editSchedule]').prop('disabled', false);
+                        enableLink(jqControlsButtons.filter('a[name=editSchedule]'));
+                        $(this).parents('div.tab-pane').find('a[name=addSchedule]').addClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=editSchedule]').removeClass('hide');
                         break;
                     }
                     case 'withdrawn': {
                         jqControlsButtons.filter('button[name=approved]').prop('disabled', true);
                         jqControlsButtons.filter('button[name=rejected]').prop('disabled', true);
-                        jqControlsButtons.filter('button[name=editSchedule]').prop('disabled', true);
-                        $(this).parents('div.tab-pane').find('button[name=addSchedule]').addClass('hide');
-                        $(this).parents('div.tab-pane').find('button[name=editSchedule]').removeClass('hide');
+                        //jqControlsButtons.filter('a[name=editSchedule]').prop('disabled', true);
+                        disableLink(jqControlsButtons.filter('a[name=editSchedule]'));
+                        $(this).parents('div.tab-pane').find('a[name=addSchedule]').addClass('hide');
+                        $(this).parents('div.tab-pane').find('a[name=editSchedule]').removeClass('hide');
                         break;
                     }
                     <? elseif ($_SESSION['role'] == 'speaker'): ?>
@@ -582,8 +592,8 @@ else {
                 $(this).removeClass('selected');
                 var jqControlsButtons = $(this).parents('div:first').find('button[type=submit]').prop('disabled', true);
                 <? if ($_SESSION['role'] == 'admin'): ?>
-                $(this).parents('div.tab-pane').find('button[name=addSchedule]').addClass('hide');
-                $(this).parents('div.tab-pane').find('button[name=editSchedule]').removeClass('hide');
+                $(this).parents('div.tab-pane').find('a[name=addSchedule]').addClass('hide');
+                $(this).parents('div.tab-pane').find('a[name=editSchedule]').removeClass('hide');
                 <? endif; ?>
                 <? if ($_SESSION['role'] == 'speaker'): ?>
                 disableLink(jqControlsButtons.filter('a[name=edit]'));
