@@ -14,7 +14,8 @@ require_once('functions.php');
 //$_POST['visitor'] = 33;
 //$_POST['venue'] = 2;
 
-if (arg_exists_not_null($_POST['visitor']) && arg_exists_not_null($_POST['venue'])) {
+if (arg_exists_not_null($_POST['visitor']) && arg_exists_not_null($_POST['venue']
+    && arg_exists_not_null($_POST['email']) && arg_exists_not_null($_POST['pass']))) {
     $auth_result = $mysqli->query("SELECT * FROM participants WHERE email = '".$mysqli->real_escape_string($_POST['email']))
         ."' AND password = '".md5(md5($_POST['password']))."' AND role = 'admin'";
     if ($auth_result->num_rows == NULL) {
