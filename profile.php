@@ -277,6 +277,18 @@ if ($_SESSION['mode'] != "signup") {
                 <? endif; ?>
             </div>
         </div>
+        <? if (arg_exists_not_null($_SESSION['auth']) && $_SESSION['role'] == 'admin' && ($_SESSION['mode'] == 'signup' || $_SESSION['mode'] == 'edit')): ?>
+        <div class="control-group">
+            <label for="orgField" class="control-label">Новий організатор?</label>
+            <div class="controls">
+                <div class="btn-group btn-block" data-toggle="buttons-radio" data-toggle-name="orgRadio">
+                    <button type="button" class="btn" name="yes">Так</button>
+                    <button type="button" class="btn active" name="no">Ні</button>
+                </div>
+                <input type="hidden" id="orgField" name="org" required="required" value="<?=($_SESSION['mode'] == "edit" && $user['role'] == 'admin') ? 'yes' : 'no'?>" />
+            </div>
+        </div>
+        <? endif; ?>
         <div class="form-actions">
             <? if ($_SESSION['mode'] == 'signup'): ?>
             <button type="submit" id="signupButton" class="btn btn-large btn-primary disabled" disabled="disabled">Зареєструватися</button>
@@ -315,14 +327,14 @@ if ($_SESSION['mode'] != "signup") {
 <!-- Registration form scripts -->
 <script type="text/javascript" id="pageJS">
 var passwords_match = false;
-<? if ($_SESSION['mode'] != 'edit'): ?>
-var age_selected = false;
-var email_free = false;
-var sex_selected = false;
-<? else: ?>
+<? if ($_SESSION['mode'] == 'home'): ?>
 var age_selected = true;
 var email_free = true;
 var sex_selected = true;
+<? else: ?>
+var age_selected = false;
+var email_free = false;
+var sex_selected = false;
 <? endif; ?>
 
 
@@ -355,6 +367,10 @@ $('#addNumber').click(function() {
     $('#phone2Controls').slideDown('fast');
     $('#addNumber').addClass('hide');
     $('#phoneField1').removeClass('input-medium-btn').addClass('input-xlarge');
+});
+
+$('div[data-toggle-name=orgRadio] button').click(function() {
+    $('#orgField').attr('value', $(this).attr('name'));
 });
 
 function viceVersaPass() {

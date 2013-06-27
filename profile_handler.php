@@ -142,6 +142,10 @@ else {
                 $fields .= $column.", ";
                 $values .= "'".$mysqli->real_escape_string($data)."', ";
             }
+            if ($_SESSION['role'] == 'admin' && arg_exists_not_null($_POST['org']) && $_POST['org'] == 'yes') {
+                $fields .= 'role, ';
+                $values .= "'admin', ";
+            }
             $fields = substr($fields, 0, strlen($fields)-2).")";
             $values = substr($values, 0, strlen($values)-2).")";
             if ($mysqli->query("INSERT INTO $table $fields VALUES $values")) {

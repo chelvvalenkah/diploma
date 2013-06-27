@@ -192,9 +192,10 @@ check_authorization($mysqli);
                     <a class="brand" href="<?=ROOT_URL?>"><?=CONF_NAME?></a>
                     <ul class="nav">
                         <li<? if ($_SERVER['SCRIPT_NAME'] == ROOT_URL) echo ' class="active"' ?>><a href="<?=ROOT_URL?>">Головна</a></li>
-                        <? if (!arg_exists_not_null($_SESSION['auth'])): ?>
+                        <? if (!arg_exists_not_null($_SESSION['auth']) || $_SESSION['role'] == 'admin'): ?>
                         <li<? if ($_SERVER['SCRIPT_NAME'] == PROFILE_URL && $_SERVER['QUERY_STRING'] == 'signup') echo ' class="active"' ?>><a href="<?=SIGNUP_URL?>">Реєстрація</a></li>
-                        <? else: ?>
+                        <? endif; ?>
+                        <? if (arg_exists_not_null($_SESSION['auth'])): ?>
                         <li<? if ($_SERVER['SCRIPT_NAME'] == PROFILE_URL && $_SERVER['QUERY_STRING'] == '') echo ' class="active"' ?>><a href="<?=PROFILE_URL?>">Профіль</a></li>
                         <li<? if ($_SERVER['SCRIPT_NAME'] == LECTURES_URL || ($_SERVER['SCRIPT_NAME'] == APPLY_URL &&
                             (arg_exists_not_null($_GET['view']) || arg_exists_not_null($_GET['edit'])))) echo ' class="active"' ?>><a href="<?=LECTURES_URL?>">Доповіді</a></li>
