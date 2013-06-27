@@ -12,14 +12,16 @@ require_once('constants.php');
 require_once('functions.php');
 
 //$_POST['visitor'] = 33;
-//$_POST['venue'] = 2;
+//$_POST['venue'] = 5;
+//$_POST['email'] = 'lubochka@cs.ai';
+//$_POST['pass'] = 'qwerty';
 
 if (arg_exists_not_null($_POST['visitor']) && arg_exists_not_null($_POST['venue']
     && arg_exists_not_null($_POST['email']) && arg_exists_not_null($_POST['pass']))) {
-    $auth_result = $mysqli->query("SELECT * FROM participants WHERE email = '".$mysqli->real_escape_string($_POST['email']))
-        ."' AND password = '".md5(md5($_POST['password']))."' AND role = 'admin'";
+    $auth_result = $mysqli->query("SELECT * FROM participants WHERE email = '".$mysqli->real_escape_string($_POST['email'])
+        ."' AND password = '".md5(md5($_POST['pass']))."' AND role = 'admin'");
     if ($auth_result->num_rows == NULL) {
-        header("HTTP/1.1 400 Bad Request");
+        header("HTTP/1.1 200 Bad Request");
         echo "Only organisers can check-in visitors!";
         exit;
     }
